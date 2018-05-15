@@ -109,8 +109,6 @@ func (s *RestInspectionRepositoryImpl) Name() string {
 // GetAll returns all known health inspections.
 func (s *RestInspectionRepositoryImpl) GetAll() (RestInspections, error) {
 
-	s.query.Print()
-
 	req, err := http.NewRequest("GET", apiURL, nil)
 	if err != nil {
 		return nil, err
@@ -122,6 +120,13 @@ func (s *RestInspectionRepositoryImpl) GetAll() (RestInspections, error) {
 	}
 
 	q := req.URL.Query()
+
+	/*
+	 * TODO
+	 * Use s.query to customize the query here.
+	 */
+	s.query.Print()
+
 	if s.limit > 0 {
 		q.Add("$limit", strconv.Itoa(s.limit))
 	}

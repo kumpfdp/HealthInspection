@@ -18,6 +18,7 @@ type QueryResult struct {
 
 var (
 	_ query.Query = &Query{}
+	_ query.QueryResult = &QueryResult{}
 )
 
 /*
@@ -64,7 +65,7 @@ func (q *Query) Print() {
 }
 
 func (q *Query) Execute() (*query.Results, error) {
-	aq, err := rest.NewRestRepository(
+	_, err := rest.NewRestRepository(
 		rest.WithName("testing"),
 		rest.WithQuery(q),
 		rest.WithLimit(1),
@@ -75,15 +76,19 @@ func (q *Query) Execute() (*query.Results, error) {
 		return nil, err
 	}
 
-	results, err := aq.GetAll()
-	if (err != nil) {
-		fmt.Println("Error: %v\n", err)
-		return nil, err
-	}
+	/*
+	 * TODO
+	 * Get all the results from the rest query
+	 * and convert those into query.Results
+	 * so that they can be returned to the executor.
+	 */
 
-	fmt.Printf("%v\n", results)
-
-	return &query.Results{&QueryResult{inspectionType: "type", violationDescription: "description"}}, nil;
+	return &query.Results{
+		/*
+		 * Sample data.
+		 */
+		&QueryResult{inspectionType: "type", violationDescription: "description"}},
+		nil;
 }
 
 func (qr *QueryResult) Print() {

@@ -3,6 +3,10 @@ package query
 type Results []QueryResult
 
 type Query interface {
+	/*
+	 * TODO
+	 * Add additional fields to the query, beyond these basics.
+	 */
 	QueryWithBusinessName(name string) Query
 	QueryWithAddress(address string) Query
 	QueryWithCity(city string) Query
