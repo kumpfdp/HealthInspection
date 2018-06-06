@@ -1,23 +1,27 @@
 package query
 
 import "fmt"
-import query "github.com/CincyGolangMeetup/HealthInspection/Query"
-import rest "github.com/CincyGolangMeetup/HealthInspection/Inspection/Rest"
+import query "github.com/kumpfdp/HealthInspection/Query"
+import rest "github.com/kumpfdp/HealthInspection/Inspection/Rest"
 
 type Query struct {
 	businessName string
-	address string
-	city string
-	state string
+	address      string
+	city         string
+	state        string
 }
 
 type QueryResult struct {
-	inspectionType string
+	businessName         string
+	address              string
+	city                 string
+	state                string
+	inspectionType       string
 	violationDescription string
 }
 
 var (
-	_ query.Query = &Query{}
+	_ query.Query       = &Query{}
 	_ query.QueryResult = &QueryResult{}
 )
 
@@ -48,31 +52,46 @@ func (q *Query) QueryWithState(state string) query.Query {
 	return q
 }
 
+func (q *Query) BusinessName() string {
+	return q.businessName
+}
+
+func (q *Query) Address() string {
+	return q.address
+}
+
+func (q *Query) City() string {
+	return q.city
+}
+
+func (q *Query) State() string {
+	return q.state
+}
+
 func (q *Query) Print() {
 	fmt.Println("Query:")
-	if (q.businessName != "") {
+	if q.businessName != "" {
 		fmt.Printf("BusinessName: %v\n", q.businessName)
 	}
-	if (q.address != "") {
+	if q.address != "" {
 		fmt.Printf("Address: %v\n", q.address)
 	}
-	if (q.city != "") {
+	if q.city != "" {
 		fmt.Printf("City: %v\n", q.city)
 	}
-	if (q.state != "") {
+	if q.state != "" {
 		fmt.Printf("State: %v\n", q.state)
 	}
 }
 
 func (q *Query) Execute() (*query.Results, error) {
-	_, err := rest.NewRestRepository(
+	repo, err := rest.NewRestRepository(
 		rest.WithName("testing"),
 		rest.WithQuery(q),
 		rest.WithLimit(1),
 	)
 
-	if (err != nil) {
-		fmt.Println("Error: %v\n", err)
+	if err != nil {
 		return nil, err
 	}
 
@@ -82,21 +101,42 @@ func (q *Query) Execute() (*query.Results, error) {
 	 * and convert those into query.Results
 	 * so that they can be returned to the executor.
 	 */
+	var inspections rest.RestInspections
+	if inspections, err = repo.GetAll(); err != nil {
+		return nil, err
+	}
 
-	return &query.Results{
-		/*
-		 * Sample data.
-		 */
-		&QueryResult{inspectionType: "type", violationDescription: "description"}},
-		nil;
+	results := make(query.Results, 0)
+	for _, inspection := range inspections {
+		results = append(results, &QueryResult{
+			businessName:         inspection.BusinessName,
+			address:              inspection.Address,
+			city:                 inspection.City,
+			state:                inspection.State,
+			inspectionType:       inspection.InspType,
+			violationDescription: inspection.ViolationDescription})
+	}
+	return &results, nil
 }
 
 func (qr *QueryResult) Print() {
-	fmt.Println("Query Result:");
-	if (qr.inspectionType != "") {
+	fmt.Println("Query Result:")
+	if qr.businessName != "" {
+		fmt.Printf("businessName: %v\n", qr.businessName)
+	}
+	if qr.address != "" {
+		fmt.Printf("address: %v\n", qr.address)
+	}
+	if qr.city != "" {
+		fmt.Printf("city: %v\n", qr.city)
+	}
+	if qr.state != "" {
+		fmt.Printf("state: %v\n", qr.state)
+	}
+	if qr.inspectionType != "" {
 		fmt.Printf("Inspection Type: %v\n", qr.inspectionType)
 	}
-	if (qr.violationDescription != "") {
+	if qr.violationDescription != "" {
 		fmt.Printf("Violation Description: %v\n", qr.violationDescription)
 	}
 }

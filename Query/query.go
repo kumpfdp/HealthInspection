@@ -7,6 +7,10 @@ type Query interface {
 	 * TODO
 	 * Add additional fields to the query, beyond these basics.
 	 */
+	BusinessName() string
+	Address() string
+	City() string
+	State() string
 	QueryWithBusinessName(name string) Query
 	QueryWithAddress(address string) Query
 	QueryWithCity(city string) Query
